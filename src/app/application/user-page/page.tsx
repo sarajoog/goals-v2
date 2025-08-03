@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React from 'react'
 import {
   Mail,
@@ -12,8 +13,16 @@ import {
   Clock,
   TrendingUp,
 } from 'lucide-react'
+import { fetchUserProfile } from '@/lib/services/userService'
 
-export default function UserAccount() {
+export default async function UserAccount() {
+  try {
+    const user = await fetchUserProfile()
+    console.log('user = ', user)
+  } catch (error) {
+    console.log(error)
+  }
+
   const userInfo = {
     name: 'Alex Johnson',
     email: 'alex.johnson@email.com',
