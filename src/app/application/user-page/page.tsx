@@ -1,5 +1,5 @@
-/* eslint-disable prettier/prettier */
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
 import {
   Mail,
   Phone,
@@ -14,18 +14,37 @@ import {
   TrendingUp,
 } from 'lucide-react'
 import { fetchUserProfile } from '@/lib/services/userService'
+import { UserProfile } from '@/types'
+import { useUser } from '@clerk/nextjs'
 
-export default async function UserAccount() {
-  try {
-    const user = await fetchUserProfile()
-    console.log('user = ', user)
-  } catch (error) {
-    console.log(error)
-  }
+export default function UserAccount() {
+  const [userProfile, setuserProfile] = useState<UserProfile | null>(null)
+  const { user } = useUser()
+
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!user?.id) {
+        return
+      }
+      try {
+        const userProfile: UserProfile = await fetchUserProfile(user.id)
+        console.log('User Profile:', userProfile)
+        if (!userProfile) {
+          throw new Error('User profile not found')
+        }
+        setuserProfile(userProfile)
+      } catch (error) {
+        console.error('Error fetching popular movies:', error)
+      } finally {
+        console.log('Popular movies loaded')
+      }
+    }
+    loadUserProfile()
+  }, [user?.id])
 
   const userInfo = {
     name: 'Alex Johnson',
-    email: 'alex.johnson@email.com',
+    email: userProfile?.email || '',
     phone: '+1 (555) 123-4567',
     location: 'San Francisco, CA',
     joinDate: 'March 2023',
